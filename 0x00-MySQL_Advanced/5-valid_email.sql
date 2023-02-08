@@ -4,12 +4,12 @@
 -- valid_email only when the email
 -- has been changed.
 DELIMITER $$
-CREATE trigger decrease_item
-AFTER INSERT ON orders
+CREATE trigger valid_email
+BEFORE UPDATE ON users
 FOR EACH ROW
 BEGIN
     IF OLD.email != NEW.email THEN
-        SET NEW.email = 0;
+        SET NEW.valid_email = 0;
     END IF;
 END $$
 DELIMITER ;
