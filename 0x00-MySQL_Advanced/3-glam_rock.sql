@@ -3,7 +3,7 @@
 -- as their main style, ranked by their longevity
 SELECT 
     band_name,
-    (YEAR(split) - YEAR(formed)) AS lifespan
+    (IFNULL(split, 2022) - formed) AS lifespan
 FROM 
     metal_bands
 WHERE
