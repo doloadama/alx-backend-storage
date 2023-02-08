@@ -1,12 +1,8 @@
 -- 3. Old school band
 -- a SQL script that lists all bands with Glam rock
 -- as their main style, ranked by their longevity
-SELECT
-    band_name
-    (YEAR(split) - YEAR(formed)) AS lifespan
-FROM
-    metal_band
-WHERE
-    main_style = 'Glam rock'
-ORDER BY
-    lifespan DESC
+SELECT band_name
+    COALESCE(split, 2020) - formed as lifespan
+FROM metal_bands
+WHERE style LIKE '%Glam rock%'
+ORDER BY lifespan DESC;
