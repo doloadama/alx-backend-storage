@@ -871,7 +871,7 @@ bob@dylan:~$
 Repo:
 
 GitHub repository: alx-backend-storage
-Directory: 0x00-MySQL_Advanced
+Directory: 0x00-MySQL_Advanced 
 File: 11-need_meeting.sql
   
 Copyright © 2023 ALX, All rights reserved.
