@@ -1,5 +1,6 @@
 -- 6. Add bonus
 -- t adds a new correction for a student
+DROP PROCEDURE IF EXISTS AddBonus;
 DELIMITER $$
 CREATE PROCEDURE addBonus(
     IN user_id INT,
