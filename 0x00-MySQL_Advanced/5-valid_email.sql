@@ -4,7 +4,7 @@
 -- valid_email only when the email
 -- has been changed.
 DELIMITER $$
-CREATE trigger valid_email
+CREATE trigger email_trigger
 BEFORE UPDATE ON users
 FOR EACH ROW
 BEGIN
