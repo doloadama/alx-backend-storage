@@ -1,2 +1,4 @@
 #!/usr/bin/env python3
-show dbs
+""" script that creates or uses the database my_db
+"""
+show dbs;
