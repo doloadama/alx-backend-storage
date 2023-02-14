@@ -8,5 +8,4 @@ def list_all(mongo_collection):
     """
     function that lists all documents in a collection
     """
-    docs = db.mongo_collection.find()
-    return [i for i in docs]
+    return mongo_collection.find()
