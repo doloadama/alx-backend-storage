@@ -1,20 +1,17 @@
 #!/usr/bin/env python3
-'''A module with tools for request caching and tracking.
-'''
-#!/usr/bin/env python3
-""" expiring web cache module """
-
+"""A module with tools for request caching and tracking.
+"""
 import redis
 import requests
 from typing import Callable
 from functools import wraps
+
 
 redis = redis.Redis()
 
 
 def wrap_requests(fn: Callable) -> Callable:
     """ Decorator wrapper """
-
     @wraps(fn)
     def wrapper(url):
         """ Wrapper for decorator guy """
