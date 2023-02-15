@@ -1,50 +1,37 @@
 #!/usr/bin/env python3
 '''A module with tools for request caching and tracking.
 '''
-import requests
+#!/usr/bin/env python3
+""" expiring web cache module """
+
 import redis
-import time
+import requests
+from typing import Callable
 from functools import wraps
 
+redis = redis.Redis()
 
-# create Redis client
-redis_client = redis.Redis(host='localhost', port=6379)
 
+def wrap_requests(fn: Callable) -> Callable:
+    """ Decorator wrapper """
+
+    @wraps(fn)
+    def wrapper(url):
+        """ Wrapper for decorator guy """
+        redis.incr(f"count:{url}")
+        cached_response = redis.get(f"cached:{url}")
+        if cached_response:
+            return cached_response.decode('utf-8')
+        result = fn(url)
+        redis.setex(f"cached:{url}", 10, result)
+        return result
+
+    return wrapper
+
+
+@wrap_requests
 def get_page(url: str) -> str:
-    # check if the page is already cached
-    cached_page = redis_client.get(url)
-    if cached_page is not None:
-        return cached_page.decode('utf-8')
-    
-    # page not cached, fetch from web and cache it
+    """get page self descriptive
+    """
     response = requests.get(url)
-    page = response.text
-    
-    # track the number of times the page is accessed
-    count_key = f"count:{url}"
-    redis_client.incr(count_key)
-
-    # cache the page with expiration time of 10 seconds
-    redis_client.setex(url, 10, page)
-    
-    return page
-
-def cache_with_expiration_time(expiration_time):
-    def decorator(func):
-        @wraps(func)
-        def wrapper(url):
-            cached_page = redis_client.get(url)
-            if cached_page is not None:
-                return cached_page.decode('utf-8')
-
-            response = func(url)
-            redis_client.setex(url, expiration_time, response)
-            return response
-        return wrapper
-    return decorator
-
-@cache_with_expiration_time(10)
-def get_page_with_cache(url: str) -> str:
-    response = requests.get(url)
-    page = response.text
-    return page
+    return response.text
