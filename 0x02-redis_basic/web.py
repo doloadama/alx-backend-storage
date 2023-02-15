@@ -1,60 +1,34 @@
 #!/usr/bin/env python3
-"""A module with tools for request caching and tracking.
 """
-import requests
-import redis
-import time
+Implements an expiring web cache and tracker
+"""
+from typing import Callable
 from functools import wraps
+import redis
+import requests
+redis_client = redis.Redis()
 
 
-# create Redis client
-redis_client = redis.Redis(host='localhost', port=6379)
+def url_count(method: Callable) -> Callable:
+    """counts how many times an url is accessed"""
+    @wraps(method)
+    def wrapper(*args, **kwargs):
+        url = args[0]
+        redis_client.incr(f"count:{url}")
+        cached = redis_client.get(f'{url}')
+        if cached:
+            return cached.decode('utf-8')
+        redis_client.setex(f'{url}, 10, {method(url)}')
+        return method(*args, **kwargs)
+    return wrapper
 
 
+@url_count
 def get_page(url: str) -> str:
-    """_summary_
-
-    Args:
-        url (str): _description_
-
-    Returns:
-        str: _description_
-    """
-    # check if the page is already cached
-    cached_page = redis_client.get(url)
-    if cached_page is not None:
-        return cached_page.decode('utf-8')
-
-    # page not cached, fetch from web and cache it
+    """get a page and cache value"""
     response = requests.get(url)
-    page = response.text
-
-    # track the number of times the page is accessed
-    count_key = f"count:{url}"
-    redis_client.incr(count_key)
-
-    # cache the page with expiration time of 10 seconds
-    redis_client.setex(url, 10, page)
-    return page
+    return response.text
 
 
-def cache_with_expiration_time(expiration_time):
-    def decorator(func):
-        @wraps(func)
-        def wrapper(url):
-            cached_page = redis_client.get(url)
-            if cached_page is not None:
-                return cached_page.decode('utf-8')
-
-            response = func(url)
-            redis_client.setex(url, expiration_time, response)
-            return response
-        return wrapper
-    return decorator
-
-
-@cache_with_expiration_time(10)
-def get_page_with_cache(url: str) -> str:
-    response = requests.get(url)
-    page = response.text
-    return page
+if __name__ == "__main__":
+    get_page('http://slowwly.robertomurray.co.uk')
