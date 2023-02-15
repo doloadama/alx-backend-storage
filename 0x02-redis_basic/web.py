@@ -12,6 +12,14 @@ redis_client = redis.Redis(host='localhost', port=6379)
 
 
 def get_page(url: str) -> str:
+    """_summary_
+
+    Args:
+        url (str): _description_
+
+    Returns:
+        str: _description_
+    """
     # check if the page is already cached
     cached_page = redis_client.get(url)
     if cached_page is not None:
