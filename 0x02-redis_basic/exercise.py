@@ -8,6 +8,7 @@
 """
 import redis
 import uuid
+from typing import Union
 
 
 class Cache:
@@ -29,3 +30,4 @@ class Cache:
          Store data in the cache.
          """
          return self._redis.set(str(uuid.uuid4()), data)
+    
