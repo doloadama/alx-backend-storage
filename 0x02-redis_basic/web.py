@@ -10,23 +10,23 @@ from functools import wraps
 # create Redis client
 redis_client = redis.Redis(host='localhost', port=6379)
 
+
 def get_page(url: str) -> str:
     # check if the page is already cached
     cached_page = redis_client.get(url)
     if cached_page is not None:
         return cached_page.decode('utf-8')
-    
+
     # page not cached, fetch from web and cache it
     response = requests.get(url)
     page = response.text
-    
+
     # track the number of times the page is accessed
     count_key = f"count:{url}"
     redis_client.incr(count_key)
 
     # cache the page with expiration time of 10 seconds
     redis_client.setex(url, 10, page)
-    
     return page
 
 
